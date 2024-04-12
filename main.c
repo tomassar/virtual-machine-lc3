@@ -114,12 +114,22 @@ void add(uint16_t instr)
 void ldi(uint16_t instr)
 {
     uint16_t r0 = (instr >> 9) & 0x7;
-    uint16_t pc_offset9 = sign_extend(instr & 0xFF, 9);
+    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
     uint16_t val = mem_read(mem_read(pc_offset9+reg[R_PC]));
     reg[r0] = val;
 
     update_flags(r0);
 }
+
+void br(uint16_t instr) 
+{
+    uint16_t cond_flag = (instr >> 9) & 0x7;
+    if(cond_flag & reg[R_COND])
+    {
+        reg[R_PC] += sign_extend((instr & 0x1FF), 9);
+    };
+}
+
 
 int main(int argc, const char* argv[]) 
 {
@@ -166,6 +176,7 @@ int main(int argc, const char* argv[])
             case OP_NOT:
                 break;
             case OP_BR:
+                br(instr);
                 break;
             case OP_JMP:
                 break;
@@ -187,8 +198,10 @@ int main(int argc, const char* argv[])
             case OP_TRAP:
                 break;
             case OP_RES:
+                abort();
                 break;
             case OP_RTI:
+                abort();
                 break;
             default:
                 break;
