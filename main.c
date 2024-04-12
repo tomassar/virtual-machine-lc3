@@ -107,6 +107,18 @@ void add(uint16_t instr)
         uint16_t r2 = instr & 0x2;
         reg[r0] = reg[r1] + reg[r2];
     };
+
+    update_flags(r0);
+}
+
+void ldi(uint16_t instr)
+{
+    uint16_t r0 = (instr >> 9) & 0x7;
+    uint16_t pc_offset9 = sign_extend(instr & 0xFF, 9);
+    uint16_t val = mem_read(mem_read(pc_offset9+reg[R_PC]));
+    reg[r0] = val;
+
+    update_flags(r0);
 }
 
 int main(int argc, const char* argv[]) 
@@ -162,6 +174,7 @@ int main(int argc, const char* argv[])
             case OP_LD:
                 break;
             case OP_LDI:
+                ldi(instr);
                 break;
             case OP_LDR:
                 break;
