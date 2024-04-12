@@ -130,6 +130,22 @@ void br(uint16_t instr)
     };
 }
 
+void and(uint16_t instr) 
+{   
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t sr1 = reg[(instr >> 6) & 0x7];
+    uint16_t sr2;
+    if (instr >> 5 & 1){
+        sr2 = sign_extend(instr & 0x1F, 5);
+    } else
+    {
+        sr2 = reg[instr & 0x7];
+    }
+
+    reg[dr] = sr1 & sr2;
+    update_flags(dr);
+}
+
 
 int main(int argc, const char* argv[]) 
 {
