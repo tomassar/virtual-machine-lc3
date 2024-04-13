@@ -205,6 +205,13 @@ void st(uint16_t instr)
     mem_write(reg[R_PC] + pc_offset9, reg[sr]);
 }
 
+void sti(uint16_t instr)
+{
+    uint16_t sr = (instr >> 9) & 0x7;
+    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
+    mem_write(mem_read(reg[R_PC] + pc_offset9), reg[sr]);
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
@@ -269,6 +276,7 @@ int main(int argc, const char* argv[])
                 ldr(instr);
                 break;
             case OP_ST:
+                st(instr);
                 break;
             case OP_STI:
                 break;
