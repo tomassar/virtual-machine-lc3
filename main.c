@@ -146,6 +146,17 @@ void and(uint16_t instr)
     update_flags(dr);
 }
 
+void jsr(uint16_t instr) 
+{
+    reg[R_R7] = reg[R_PC];
+    if (instr >> 11 & 1)
+    {
+        reg[R_PC] = sign_extend(instr & 0x7FF, 11); // JSR
+    } else 
+    {
+        reg[R_PC] = reg[(instr >> 6) & 0x7]; // JSRR
+    }
+}
 
 int main(int argc, const char* argv[]) 
 {
