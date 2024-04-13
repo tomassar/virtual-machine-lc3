@@ -68,6 +68,11 @@ uint16_t mem_read(uint16_t addr)
 
 };
 
+void mem_write(uint16_t addr, uint16_t dr)
+{
+
+};
+
 uint16_t sign_extend(uint16_t x, int bit_count)
 {
     if ((x >> (bit_count - 1)) & 1) {
@@ -191,6 +196,13 @@ void not(uint16_t instr)
     uint16_t sr = (instr >> 6) & 0x7;
     reg[dr] = ~reg[sr];
     update_flags(dr);
+}
+
+void st(uint16_t instr)
+{
+    uint16_t sr = (instr >> 9) & 0x7;
+    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
+    mem_write(reg[R_PC] + pc_offset9, reg[sr]);
 }
 
 int main(int argc, const char* argv[]) 
