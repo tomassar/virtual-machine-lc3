@@ -166,6 +166,16 @@ void ld(uint16_t instr)
     update_flags(dr);
 }
 
+void ldr(uint16_t instr)
+{
+    uint16_t offset6 = instr & 0x3F;
+    uint16_t base_r = reg[(instr >> 6) & 0x7];
+    uint16_t dr = (instr >> 9) & 0x7;
+    reg[dr] = mem_read(base_r+sign_extend(offset6, 6));
+    
+    update_flags(dr);
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
