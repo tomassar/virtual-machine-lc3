@@ -221,6 +221,12 @@ void str(uint16_t instr)
     mem_write(reg[base_r] + offset6, reg[sr]);
 }
 
+void jmp(uint16_t instr) //also ret
+{
+    uint16_t base_r = (instr >> 6) & 0x7;
+    reg[R_PC] = reg[base_r];
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
@@ -271,6 +277,7 @@ int main(int argc, const char* argv[])
                 br(instr);
                 break;
             case OP_JMP:
+                jpm(instr);
                 break;
             case OP_JSR:
                 jsr(instr);
@@ -291,6 +298,7 @@ int main(int argc, const char* argv[])
                 sti(instr);
                 break;
             case OP_STR:
+                str(instr);
                 break;
             case OP_TRAP:
                 break;
