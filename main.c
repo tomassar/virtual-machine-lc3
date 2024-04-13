@@ -185,6 +185,14 @@ void lea(uint16_t instr)
     update_flags(dr);
 }
 
+void not(uint16_t instr)
+{
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t sr = (instr >> 6) & 0x7;
+    reg[dr] = ~reg[sr];
+    update_flags(dr);
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
@@ -226,8 +234,10 @@ int main(int argc, const char* argv[])
                 add(instr);
                 break;
             case OP_AND:
+                and(instr);
                 break;
             case OP_NOT:
+                not(instr);
                 break;
             case OP_BR:
                 br(instr);
@@ -235,13 +245,16 @@ int main(int argc, const char* argv[])
             case OP_JMP:
                 break;
             case OP_JSR:
+                jsr(instr);
                 break;
             case OP_LD:
+                ld(instr);
                 break;
             case OP_LDI:
                 ldi(instr);
                 break;
             case OP_LDR:
+                ldr(instr);
                 break;
             case OP_ST:
                 break;
