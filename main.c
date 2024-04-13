@@ -158,6 +158,14 @@ void jsr(uint16_t instr)
     }
 }
 
+void ld(uint16_t instr)
+{
+    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
+    uint16_t dr = (instr >> 9) & 0x7;
+    reg[dr] = mem_read(reg[R_PC] + pc_offset9);
+    update_flags(dr);
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
