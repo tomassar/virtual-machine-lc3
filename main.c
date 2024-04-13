@@ -172,7 +172,16 @@ void ldr(uint16_t instr)
     uint16_t base_r = reg[(instr >> 6) & 0x7];
     uint16_t dr = (instr >> 9) & 0x7;
     reg[dr] = mem_read(base_r+sign_extend(offset6, 6));
-    
+
+    update_flags(dr);
+}
+
+void lea(uint16_t instr)
+{
+    uint16_t dr = (instr >> 9) & 0x7;
+    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
+    reg[dr] = reg[R_PC] + pc_offset9;
+
     update_flags(dr);
 }
 
