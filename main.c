@@ -248,6 +248,43 @@ void trap_puts()
     fflush(stdout);
 }
 
+void trap_getc()
+{
+    reg[R_R0] = (uint16_t)getchar();
+    update_flags(R_R0);
+}
+
+void trap_out()
+{
+    putc((char)reg[R_R0], stdout);
+    fflush(stdout);
+}
+
+void trap_in()
+{
+    printf("Enter a character: ");
+    char c = getchar();
+    putc(c, stdout);
+    fflush(stdout);
+
+    reg[R_R0] = (uint16_t)c;
+    update_flags(R_R0);
+}
+
+void trap_putsp()
+{
+    uint16_t* c = memory + reg[R_R0];
+    while (*c)
+    {
+        char char1 = (*c) & 0xFF;
+        putc(char1, stdout);
+        char char2 = (*c) >> 8;
+        if (char2) putc(char2,stdout);
+        ++c;
+    }
+    fflush(stdout);
+}
+
 void trap(uint16_t instr)
 {
     reg[R_R7] = reg[R_PC];
@@ -255,22 +292,19 @@ void trap(uint16_t instr)
     switch (instr & 0xFF)
     {
         case TRAP_GETC:
-            trap_getc(instr);
+            trap_getc();
         break;
         case TRAP_OUT:
-            trap_out(instr);
+            trap_out();
             break;
         case TRAP_PUTS:
-            trap_puts(instr);
+            trap_puts();
             break;
         case TRAP_IN:
-            trap_in(instr);
+            trap_in();
             break;
         case TRAP_PUTSP:
-            trap_in(instr);
-            break;
-        case TRAP_HALT:
-            trap_in(instr);
+            trap_in();
             break;
     }
 }
@@ -349,7 +383,14 @@ int main(int argc, const char* argv[])
                 str(instr);
                 break;
             case OP_TRAP:
-                trap(instr);
+                if (instr & 0xFF == TRAP_HALT) 
+                {
+                    puts("HALT");
+                    fflush(stdout);
+                    running = 0 ;
+                }else {
+                    trap(instr);
+                }
                 break;
             case OP_RES:
                 abort();
