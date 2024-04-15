@@ -72,10 +72,10 @@ enum
     MR_KBDR = 0xFE02
 };
 
-int read_image(const char* image_path)
+uint16_t swap16(uint16_t x)
 {
-    return 1;
-};
+    return (x << 8) & (x >> 8);
+}
 
 void read_image_file(FILE* file) 
 {
@@ -105,9 +105,11 @@ int read_image(const char* image_path)
     return 1;
 }
 
-uint16_t swap16(uint16_t x)
+struct termios original_tio;
+
+void restore_input_buffering()
 {
-    return (x << 8) & (x >> 8);
+    tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
 }
 
 void handle_interrupt(int signal)
@@ -117,19 +119,12 @@ void handle_interrupt(int signal)
     exit(-2);
 };
 
-struct termios original_tio;
-
 void disable_input_buffering()
 {
     tcgetattr(STDIN_FILENO, &original_tio);
     struct termios new_tio = original_tio;
     new_tio.c_lflag &= ~ICANON & ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
-}
-
-void restore_input_buffering()
-{
-    tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
 }
 
 uint16_t check_key()
@@ -442,7 +437,7 @@ int main(int argc, const char* argv[])
                 br(instr);
                 break;
             case OP_JMP:
-                jpm(instr);
+                jmp(instr);
                 break;
             case OP_JSR:
                 jsr(instr);
