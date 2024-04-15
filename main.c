@@ -112,6 +112,9 @@ uint16_t swap16(uint16_t x)
 
 void handle_interrupt(int signal)
 {
+    restore_input_buffering();
+    printf("\n");
+    exit(-2);
 };
 
 struct termios original_tio;
