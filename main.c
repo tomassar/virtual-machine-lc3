@@ -50,6 +50,16 @@ enum
     FL_NEG = 1 << 2, //N
 };
 
+enum
+{
+    TRAP_GETC = 0x20, //get character from keyboard, not echoed onto the terminal
+    TRAP_OUT = 0x1, //output a character
+    TRAP_PUTS = 0x22, //output a word string
+    TRAP_IN = 0x23, //get character from keyboard, echoed onto the terminal
+    TRAP_PUTSP = 0x24, //output a byte string
+    TRAP_HALT = 0x25 //halt the program
+};
+
 int read_image(const char* image_path)
 {
     return 1;
@@ -227,6 +237,44 @@ void jmp(uint16_t instr) //also ret
     reg[R_PC] = reg[base_r];
 }
 
+void trap_puts()
+{
+    uint16_t* c = memory + reg[R_R0];
+    while(*c)
+    {
+        putc((char)*c, stdout);
+        ++c;
+    }
+    fflush(stdout);
+}
+
+void trap(uint16_t instr)
+{
+    reg[R_R7] = reg[R_PC];
+
+    switch (instr & 0xFF)
+    {
+        case TRAP_GETC:
+            trap_getc(instr);
+        break;
+        case TRAP_OUT:
+            trap_out(instr);
+            break;
+        case TRAP_PUTS:
+            trap_puts(instr);
+            break;
+        case TRAP_IN:
+            trap_in(instr);
+            break;
+        case TRAP_PUTSP:
+            trap_in(instr);
+            break;
+        case TRAP_HALT:
+            trap_in(instr);
+            break;
+    }
+}
+
 int main(int argc, const char* argv[]) 
 {
     if (argc < 2) 
@@ -301,6 +349,7 @@ int main(int argc, const char* argv[])
                 str(instr);
                 break;
             case OP_TRAP:
+                trap(instr);
                 break;
             case OP_RES:
                 abort();
